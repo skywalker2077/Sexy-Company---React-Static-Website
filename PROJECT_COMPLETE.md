@@ -49,15 +49,17 @@ src/
 
 ## 🌐 URLs do Site
 
-### **🔗 Site Principal (Funcionando):**
+### **🔗 URL Principal (Funcionando):**
 ```
 https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 ```
+**✅ Status:** Testado e funcionando perfeitamente
 
-### **🔗 URL Alternativa:**
+### **🔗 URL de Bucket (Lista arquivos):**
 ```
 https://sexy-company.s3.us-east-2.amazonaws.com
 ```
+**⚠️ Nota:** Mostra lista de arquivos, não o site. Use a URL com /index.html
 
 ### **🔗 Website Hosting (Em configuração):**
 ```

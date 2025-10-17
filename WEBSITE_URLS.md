@@ -6,17 +6,17 @@
 ```
 https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 ```
-**Status:** ✅ Funcionando  
-**Tipo:** Acesso direto ao S3 com HTTPS  
-**Uso:** URL principal para compartilhar
+**Status:** ✅ Funcionando perfeitamente  
+**Tipo:** Acesso direto ao site React com HTTPS  
+**Uso:** URL principal para compartilhar e acessar o site
 
-### **🔗 URL Direta ao Bucket:**
+### **🔗 URL do Bucket (Sem index.html):**
 ```
 https://sexy-company.s3.us-east-2.amazonaws.com
 ```
-**Status:** ✅ Funcionando  
-**Tipo:** Acesso direto ao bucket S3  
-**Uso:** Listagem de arquivos (se habilitada)
+**Status:** ⚠️ Access Denied (esperado)  
+**Tipo:** Acesso direto ao bucket sem especificar arquivo  
+**Explicação:** S3 direct access requer especificar o arquivo (/index.html)
 
 ## ⚠️ URLs em Configuração
 
