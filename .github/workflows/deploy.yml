@@ -1,0 +1,127 @@
+name: Deploy to S3
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build and Deploy to S3
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: 📦 Install dependencies
+      run: npm ci
+      
+    - name: 🏗️ Build application
+      run: npm run build
+      
+    - name: 📊 Build summary
+      run: |
+        echo "📊 Build completed successfully!"
+        echo "📁 Build directory contents:"
+        ls -la build/
+        echo ""
+        echo "📄 Key files:"
+        ls -la build/*.html 2>/dev/null || echo "No HTML files found"
+        ls -la build/static/ 2>/dev/null || echo "No static directory found"
+        
+    - name: 🔑 Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: 🪣 Deploy to S3
+      run: |
+        BUCKET_NAME="sexy-company"
+        echo "🚀 Starting deployment to S3 bucket: $BUCKET_NAME"
+        echo ""
+        
+        # Create bucket if it doesn't exist
+        if ! aws s3 ls s3://$BUCKET_NAME 2>/dev/null; then
+          echo "📦 Creating bucket $BUCKET_NAME..."
+          aws s3 mb s3://$BUCKET_NAME --region us-east-1
+        else
+          echo "✅ Bucket $BUCKET_NAME already exists"
+        fi
+        
+        # Sync files to S3
+        echo "📤 Uploading files to S3..."
+        aws s3 sync build/ s3://$BUCKET_NAME --delete
+        
+        echo "✅ Files uploaded successfully!"
+        
+    - name: 🌐 Configure website hosting
+      run: |
+        BUCKET_NAME="sexy-company"
+        echo "🌐 Configuring S3 website hosting..."
+        
+        # Configure website
+        aws s3 website s3://$BUCKET_NAME \
+          --index-document index.html \
+          --error-document index.html
+          
+        echo "✅ Website hosting configured!"
+        
+    - name: 🔓 Configure public access
+      run: |
+        BUCKET_NAME="sexy-company"
+        echo "🔓 Configuring public access..."
+        
+        # Remove public access blocks
+        aws s3api put-public-access-block \
+          --bucket $BUCKET_NAME \
+          --public-access-block-configuration \
+          BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false
+          
+        # Create bucket policy
+        cat > bucket-policy.json << 'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadGetObject",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::sexy-company/*"
+            }
+          ]
+        }
+        EOF
+        
+        # Apply bucket policy
+        aws s3api put-bucket-policy --bucket $BUCKET_NAME --policy file://bucket-policy.json
+        
+        echo "✅ Public access configured!"
+        
+    - name: 🎉 Deployment complete
+      run: |
+        BUCKET_NAME="sexy-company"
+        echo ""
+        echo "🎉 Deployment completed successfully!"
+        echo "=================================="
+        echo ""
+        echo "🌐 Your website is now live at:"
+        echo "   Website URL: http://$BUCKET_NAME.s3-website-us-east-1.amazonaws.com"
+        echo "   Direct URL:  https://$BUCKET_NAME.s3.amazonaws.com/index.html"
+        echo ""
+        echo "📊 Deployment summary:"
+        echo "   ✅ Built React application"
+        echo "   ✅ Uploaded to S3 bucket: $BUCKET_NAME"
+        echo "   ✅ Configured website hosting"
+        echo "   ✅ Enabled public access"
+        echo ""
+        echo "🚀 Ready to receive visitors!"
