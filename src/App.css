@@ -1,0 +1,7 @@
+.App {
+  text-align: center;
+}
+
+.App main {
+  min-height: 100vh;
+}

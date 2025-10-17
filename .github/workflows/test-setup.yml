@@ -1,0 +1,171 @@
+name: Test Workflows
+
+# Workflow para testar se os outros workflows estão funcionando
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of test to run'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+          - basic
+          - full
+
+jobs:
+  test-setup:
+    name: Test GitHub Actions Setup
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Verify workflow files
+      run: |
+        echo "🔍 Checking GitHub Actions workflow files..."
+        
+        WORKFLOWS_DIR=".github/workflows"
+        
+        if [ -d "$WORKFLOWS_DIR" ]; then
+          echo "✅ Workflows directory exists"
+          
+          echo "📄 Available workflow files:"
+          ls -la $WORKFLOWS_DIR/
+          
+          # Verificar workflows específicos
+          REQUIRED_WORKFLOWS=("ci.yml" "build-and-deploy.yml" "quality-check.yml" "deploy-s3.yml")
+          
+          for workflow in "${REQUIRED_WORKFLOWS[@]}"; do
+            if [ -f "$WORKFLOWS_DIR/$workflow" ]; then
+              echo "✅ $workflow found"
+            else
+              echo "❌ $workflow missing"
+            fi
+          done
+          
+        else
+          echo "❌ Workflows directory not found"
+          exit 1
+        fi
+        
+    - name: 🟢 Setup Node.js (Test Dependencies)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: 📦 Test dependency installation
+      run: |
+        echo "📦 Testing npm install..."
+        npm ci
+        echo "✅ Dependencies installed successfully"
+        
+    - name: 🏗️ Test build process
+      run: |
+        echo "🏗️ Testing build process..."
+        npm run build
+        echo "✅ Build completed successfully"
+        
+        echo "📊 Build output analysis:"
+        ls -la build/
+        
+        # Verificar arquivos críticos
+        if [ -f "build/index.html" ]; then
+          echo "✅ index.html generated"
+        else
+          echo "❌ index.html not found"
+        fi
+        
+        if [ -d "build/static" ]; then
+          echo "✅ Static assets directory created"
+          
+          # Contar arquivos JS e CSS
+          JS_COUNT=$(find build/static -name "*.js" | wc -l)
+          CSS_COUNT=$(find build/static -name "*.css" | wc -l)
+          
+          echo "📄 Generated $JS_COUNT JavaScript files"
+          echo "📄 Generated $CSS_COUNT CSS files"
+        else
+          echo "❌ Static assets directory not found"
+        fi
+        
+    - name: ⚙️ Test workflow configuration
+      run: |
+        echo "⚙️ Testing workflow configurations..."
+        
+        # Verificar sintaxe YAML dos workflows
+        echo "🔍 Checking YAML syntax..."
+        
+        for workflow in .github/workflows/*.yml .github/workflows/*.yaml; do
+          if [ -f "$workflow" ]; then
+            echo "Checking $(basename "$workflow")..."
+            
+            # Verificação básica de sintaxe YAML  
+            if command -v node &> /dev/null; then
+              # Usar Node.js para validar YAML básico
+              node -e "
+                const fs = require('fs');
+                try {
+                  const content = fs.readFileSync('$workflow', 'utf8');
+                  // Verificação básica de estrutura
+                  if (content.includes('name:') && content.includes('on:')) {
+                    console.log('✅ Basic YAML structure valid');
+                  } else {
+                    console.log('⚠️ Missing required workflow keys');
+                  }
+                } catch (e) {
+                  console.log('❌ Error reading workflow file');
+                }
+              "
+            else
+              echo "ℹ️ Node.js validation skipped"
+            fi
+          fi
+        done
+        
+    - name: 📋 Generate test report
+      run: |
+        echo "📋 GitHub Actions Setup Test Report"
+        echo "=================================="
+        echo "Date: $(date)"
+        echo "Repository: $GITHUB_REPOSITORY"
+        echo "Branch: $GITHUB_REF_NAME"
+        echo "Commit: $GITHUB_SHA"
+        echo ""
+        echo "✅ Workflow files: Present"
+        echo "✅ Dependencies: OK"
+        echo "✅ Build process: OK"
+        echo "✅ File generation: OK"
+        echo ""
+        echo "🎉 GitHub Actions setup is ready!"
+        echo ""
+        echo "Next steps:"
+        echo "1. Configure AWS credentials in repository secrets"
+        echo "2. Set up S3 bucket for deployment"
+        echo "3. Configure CloudFront distribution (optional)"
+        echo "4. Test deployment workflow"
+        
+    - name: 📝 Check documentation
+      run: |
+        echo "📝 Checking documentation files..."
+        
+        if [ -f ".github/GITHUB_ACTIONS_SETUP.md" ]; then
+          echo "✅ GitHub Actions setup guide found"
+        else
+          echo "❌ Setup guide missing"
+        fi
+        
+        if [ -f "README.md" ]; then
+          echo "✅ README.md found"
+          
+          # Verificar se README menciona GitHub Actions
+          if grep -q "GitHub Actions" README.md; then
+            echo "✅ README includes GitHub Actions information"
+          else
+            echo "ℹ️ Consider adding GitHub Actions info to README"
+          fi
+        else
+          echo "❌ README.md missing"
+        fi

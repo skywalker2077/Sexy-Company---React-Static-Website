@@ -1,0 +1,102 @@
+name: Build and Deploy React App
+
+# Trigger do workflow - executa em push para main e em pull requests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    # Checkout do código fonte
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    # Configuração do Node.js
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    # Cache das dependências para acelerar builds subsequentes
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+          
+    # Instalação das dependências
+    - name: Install dependencies
+      run: npm ci
+      
+    # Verificação de vulnerabilidades
+    - name: Run security audit
+      run: npm audit --audit-level moderate
+      continue-on-error: true
+      
+    # Verificação de lint/type checking
+    - name: Run type checking
+      run: npx tsc --noEmit
+      continue-on-error: true
+      
+    # Build do projeto
+    - name: Build project
+      run: npm run build
+      env:
+        CI: false # Previne que warnings sejam tratados como erros
+        
+    # Upload dos artifacts do build
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-files-${{ matrix.node-version }}
+        path: build/
+        retention-days: 7
+        
+    # Teste do build (verificar se os arquivos foram gerados)
+    - name: Test build output
+      run: |
+        ls -la build/
+        test -f build/index.html
+        test -d build/static
+        echo "✅ Build artifacts verified successfully!"
+
+  # Job de deploy (opcional - pode ser configurado posteriormente)
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-files-20.x
+        path: build/
+        
+    - name: Display build contents
+      run: |
+        echo "📦 Build artifacts ready for deployment:"
+        ls -la build/
+        
+    # Aqui você pode adicionar steps de deploy para AWS S3, Netlify, Vercel, etc.
+    # Exemplo para futuro deploy:
+    # - name: Deploy to AWS S3
+    #   run: |
+    #     aws s3 sync build/ s3://your-bucket-name --delete
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_DEFAULT_REGION: us-east-1
