@@ -107,22 +107,45 @@ jobs:
         
         echo "✅ Public access configured!"
         
+    - name: ⚡ Invalidate CloudFront cache
+      run: |
+        DISTRIBUTION_ID="E2UTZ254M2KQPK"
+        echo "⚡ Invalidating CloudFront cache..."
+        
+        # Create CloudFront invalidation
+        INVALIDATION_ID=$(aws cloudfront create-invalidation \
+          --distribution-id $DISTRIBUTION_ID \
+          --paths "/*" \
+          --query 'Invalidation.Id' \
+          --output text)
+          
+        echo "✅ CloudFront invalidation created: $INVALIDATION_ID"
+        echo "📡 Cache will be cleared in 1-3 minutes"
+        
     - name: 🎉 Deployment complete
       run: |
         BUCKET_NAME="sexy-company"
+        CLOUDFRONT_URL="dd6gi5ps2pi94.cloudfront.net"
         echo ""
         echo "🎉 Deployment completed successfully!"
         echo "=================================="
         echo ""
         echo "🌐 Your website is now live at:"
-        echo "   Primary URL:  https://$BUCKET_NAME.s3.us-east-2.amazonaws.com/index.html"
-        echo "   Direct URL:   https://$BUCKET_NAME.s3.us-east-2.amazonaws.com"
-        echo "   Website URL:  http://$BUCKET_NAME.s3-website-us-east-2.amazonaws.com (may need DNS propagation)"
+        echo "   🚀 CloudFront URL (RECOMMENDED): https://$CLOUDFRONT_URL"
+        echo "   📦 S3 Direct URL: https://$BUCKET_NAME.s3.us-east-2.amazonaws.com/index.html"
+        echo "   🌍 S3 Website URL: http://$BUCKET_NAME.s3-website-us-east-2.amazonaws.com"
         echo ""
         echo "📊 Deployment summary:"
         echo "   ✅ Built React application"
         echo "   ✅ Uploaded to S3 bucket: $BUCKET_NAME"
         echo "   ✅ Configured website hosting"
         echo "   ✅ Enabled public access"
+        echo "   ✅ Invalidated CloudFront cache"
         echo ""
-        echo "🚀 Ready to receive visitors!"
+        echo "⚡ CloudFront benefits:"
+        echo "   � HTTPS enabled with SSL certificate"
+        echo "   🌍 Global CDN for faster loading"
+        echo "   📦 Optimized caching (HTML: 5min, Assets: 1 year)"
+        echo "   🗜️ GZIP/Brotli compression enabled"
+        echo ""
+        echo "�🚀 Ready to receive visitors worldwide!"
