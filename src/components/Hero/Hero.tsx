@@ -14,7 +14,7 @@ const Hero: React.FC = () => {
       <div className="hero-overlay"></div>
       <div className="hero-content">
         <h1 className="hero-title">
-          BEM-VINDOS À<br />
+          BEM-VINDO<br />
           <span className="company-name">SEXY COMPANY</span>
         </h1>
         
