@@ -34,7 +34,7 @@ Para usar o workflow de deploy AWS com o bucket **sexy-company**, configure os s
 
 ### 1. Acesse as configurações do repositório
 ```
-skywalker2077/site_estatico_s3 → Settings → Secrets and variables → Actions
+skywalker2077/Sexy-Company---React-Static-Website → Settings → Secrets and variables → Actions
 ```
 
 ### 2. Configure os seguintes **Repository Secrets**:

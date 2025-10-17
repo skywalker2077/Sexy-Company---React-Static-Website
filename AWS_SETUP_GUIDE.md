@@ -32,7 +32,7 @@ Isso significa que as credenciais AWS não estão corretas ou não foram configu
 
 1. **Acesse seu repositório**: 
    ```
-   https://github.com/skywalker2077/site_estatico_s3
+   https://github.com/skywalker2077/Sexy-Company---React-Static-Website
    ```
 
 2. **Vá para Settings** → **Secrets and variables** → **Actions**
