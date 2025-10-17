@@ -1,0 +1,7 @@
+# 🚀 Deploy Trigger
+
+**Timestamp:** 2025-10-17 Manual Deploy
+**Action:** Manual deploy trigger  
+**Target:** S3 Bucket sexy-company
+
+Este arquivo força a execução do workflow de deploy.
