@@ -1,0 +1,59 @@
+name: Debug AWS Connection
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    name: Debug AWS and S3
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔍 Test AWS Credentials
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1
+      run: |
+        echo "🔍 Testing AWS connection..."
+        
+        # Test AWS identity
+        if aws sts get-caller-identity; then
+          echo "✅ AWS credentials working"
+        else
+          echo "❌ AWS credentials failed"
+          exit 1
+        fi
+        
+        # Test S3 access
+        echo ""
+        echo "🪣 Testing S3 access..."
+        aws s3 ls
+        
+        # Check specific bucket
+        echo ""
+        echo "🔍 Checking bucket 'sexy-company'..."
+        if aws s3 ls s3://sexy-company/; then
+          echo "✅ Bucket exists and accessible"
+          echo "📄 Current contents:"
+          aws s3 ls s3://sexy-company/ --recursive
+        else
+          echo "⚠️ Bucket not accessible or empty"
+        fi
+        
+        # Test bucket creation if needed
+        echo ""
+        echo "🔧 Testing bucket operations..."
+        if ! aws s3 ls s3://sexy-company/ 2>/dev/null; then
+          echo "Creating bucket..."
+          aws s3 mb s3://sexy-company --region us-east-1
+        fi
+        
+        # Test upload
+        echo "test" > test-file.txt
+        aws s3 cp test-file.txt s3://sexy-company/test-file.txt
+        echo "✅ Upload test successful"
+        
+        # Clean up
+        aws s3 rm s3://sexy-company/test-file.txt
+        echo "✅ Cleanup successful"
