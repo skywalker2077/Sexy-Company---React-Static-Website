@@ -41,7 +41,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: us-east-2
         
     - name: 🪣 Deploy to S3
       run: |
@@ -52,7 +52,7 @@ jobs:
         # Create bucket if it doesn't exist
         if ! aws s3 ls s3://$BUCKET_NAME 2>/dev/null; then
           echo "📦 Creating bucket $BUCKET_NAME..."
-          aws s3 mb s3://$BUCKET_NAME --region us-east-1
+          aws s3 mb s3://$BUCKET_NAME --region us-east-2
         else
           echo "✅ Bucket $BUCKET_NAME already exists"
         fi
@@ -115,8 +115,9 @@ jobs:
         echo "=================================="
         echo ""
         echo "🌐 Your website is now live at:"
-        echo "   Website URL: http://$BUCKET_NAME.s3-website-us-east-1.amazonaws.com"
-        echo "   Direct URL:  https://$BUCKET_NAME.s3.amazonaws.com/index.html"
+        echo "   Primary URL:  https://$BUCKET_NAME.s3.us-east-2.amazonaws.com/index.html"
+        echo "   Direct URL:   https://$BUCKET_NAME.s3.us-east-2.amazonaws.com"
+        echo "   Website URL:  http://$BUCKET_NAME.s3-website-us-east-2.amazonaws.com (may need DNS propagation)"
         echo ""
         echo "📊 Deployment summary:"
         echo "   ✅ Built React application"

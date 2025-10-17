@@ -49,14 +49,19 @@ src/
 
 ## 🌐 URLs do Site
 
-### **🔗 Site Principal:**
+### **🔗 Site Principal (Funcionando):**
 ```
-http://sexy-company.s3-website-us-east-1.amazonaws.com
+https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 ```
 
-### **🔗 URL Direta:**
+### **🔗 URL Alternativa:**
 ```
-https://sexy-company.s3.amazonaws.com/index.html
+https://sexy-company.s3.us-east-2.amazonaws.com
+```
+
+### **🔗 Website Hosting (Em configuração):**
+```
+http://sexy-company.s3-website-us-east-2.amazonaws.com
 ```
 
 ---
