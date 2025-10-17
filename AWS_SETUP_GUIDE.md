@@ -44,10 +44,18 @@ Isso significa que as credenciais AWS não estão corretas ou não foram configu
    
    **Nome**: `AWS_SECRET_ACCESS_KEY`
    **Valor**: Sua Secret Access Key da AWS
+   
+   **Nome**: `S3_BUCKET_NAME` (opcional)
+   **Valor**: `sexy-company`
 
 ### Passo 4: Verificar Bucket S3
 
 Certifique-se de que o bucket `sexy-company` existe ou será criado automaticamente.
+
+**🔧 Sobre o S3_BUCKET_NAME:**
+- **É opcional** - O workflow já tem o nome hardcoded como `sexy-company`
+- **Configure apenas se** quiser usar um bucket diferente
+- **Valor padrão:** `sexy-company` (se não configurar o secret)
 
 ## 🔐 Política IAM Personalizada (Alternativa)
 
@@ -113,3 +121,22 @@ http://sexy-company.s3-website-us-east-1.amazonaws.com
 **Erro: Invalid Token**
 - Regenere as Access Keys na AWS
 - Atualize os secrets no GitHub
+
+## 🔑 Resumo dos Secrets Necessários
+
+### **Obrigatórios:**
+1. `AWS_ACCESS_KEY_ID` → Sua Access Key ID da AWS
+2. `AWS_SECRET_ACCESS_KEY` → Sua Secret Access Key da AWS
+
+### **Opcional:**
+3. `S3_BUCKET_NAME` → Nome do bucket (padrão: `sexy-company`)
+
+### **Configuração no GitHub:**
+```
+Repository → Settings → Secrets and variables → Actions → New repository secret
+```
+
+**Exemplo de configuração:**
+- **AWS_ACCESS_KEY_ID**: `AKIAIOSFODNN7EXAMPLE` 
+- **AWS_SECRET_ACCESS_KEY**: `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
+- **S3_BUCKET_NAME**: `sexy-company` (opcional)
