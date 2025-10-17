@@ -28,7 +28,7 @@ Execute estes comandos no seu terminal AWS CLI:
 aws s3 ls s3://sexy-company
 
 # Se não existir, criar
-aws s3 mb s3://sexy-company --region us-east-1
+aws s3 mb s3://sexy-company --region us-east-2
 
 # Configurar website hosting
 aws s3 website s3://sexy-company \
@@ -109,13 +109,13 @@ aws iam attach-user-policy \
 ```bash
 # Qualquer push para main irá fazer deploy automaticamente
 git add .
-git commit -m "Deploy Sexy Company to S3"
+git commit -m "Deploy Sexy Company para S3"
 git push origin main
 ```
 
 ### Método 2: Deploy Manual via GitHub
 1. Vá para `Actions` no seu repositório
-2. Clique em `Deploy to S3 - Sexy Company`
+2. Clique em `Deploy Sexy Company para S3`
 3. Clique em `Run workflow`
 4. Clique em `Run workflow` novamente
 
@@ -132,8 +132,8 @@ aws s3 sync build/ s3://sexy-company --delete
 
 Após o deploy, seu site estará disponível em:
 
-- **S3 Website URL**: http://sexy-company.s3-website-us-east-1.amazonaws.com
-- **S3 Direct URL**: https://sexy-company.s3.amazonaws.com/index.html
+- **S3 Website URL**: http://sexy-company.s3-website-us-east-2.amazonaws.com
+- **S3 Direct URL (Funcionando)**: https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 
 ## 🔍 Verificar Status do Deploy
 
@@ -145,10 +145,10 @@ Após o deploy, seu site estará disponível em:
 ### Testar o Site
 ```bash
 # Testar se o site está online
-curl -I http://sexy-company.s3-website-us-east-1.amazonaws.com
+curl -I https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 
 # Ver conteúdo da página
-curl http://sexy-company.s3-website-us-east-1.amazonaws.com
+curl https://sexy-company.s3.us-east-2.amazonaws.com/index.html
 ```
 
 ## 🐛 Troubleshooting
@@ -159,7 +159,7 @@ curl http://sexy-company.s3-website-us-east-1.amazonaws.com
 ### ❌ Erro: "NoSuchBucket"
 **Solução:** Criar o bucket primeiro:
 ```bash
-aws s3 mb s3://sexy-company --region us-east-1
+aws s3 mb s3://sexy-company --region us-east-2
 ```
 
 ### ❌ Erro: "403 Forbidden" no site
@@ -182,7 +182,7 @@ Execute este script para configurar tudo de uma vez:
 echo "🚀 Configurando bucket sexy-company para Sexy Company..."
 
 # Criar bucket se não existir
-aws s3 mb s3://sexy-company --region us-east-1 2>/dev/null || echo "Bucket já existe"
+aws s3 mb s3://sexy-company --region us-east-2 2>/dev/null || echo "Bucket já existe"
 
 # Configurar website hosting
 aws s3 website s3://sexy-company --index-document index.html --error-document index.html
@@ -210,7 +210,7 @@ EOF
 aws s3api put-bucket-policy --bucket sexy-company --policy file:///tmp/bucket-policy.json
 
 echo "✅ Configuração completa!"
-echo "🌐 Seu site estará em: http://sexy-company.s3-website-us-east-1.amazonaws.com"
+echo "🌐 Seu site estará em: https://sexy-company.s3.us-east-2.amazonaws.com/index.html"
 ```
 
 ## ✅ Lista Final
