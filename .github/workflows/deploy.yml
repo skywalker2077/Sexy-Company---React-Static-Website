@@ -109,10 +109,10 @@ jobs:
         
     - name: ⚡ Invalidate CloudFront cache
       run: |
-        DISTRIBUTION_ID="E2UTZ254M2KQPK"
+        DISTRIBUTION_ID="E1KAU442K7IFPV"
         echo "⚡ Invalidating CloudFront cache..."
         
-        # Create CloudFront invalidation
+        # Create CloudFront invalidation for new distribution with custom domain
         INVALIDATION_ID=$(aws cloudfront create-invalidation \
           --distribution-id $DISTRIBUTION_ID \
           --paths "/*" \
